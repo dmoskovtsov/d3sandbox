@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript"
+            src="../d3/d3.v3.js"></script>
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+<script>
+
+    var svg = d3.select('body')
+            .append('svg');
+
+    svg.append('rect')
+            .attr('x', '100')
+            .attr('y', '100')
+            .attr('width', '20')
+            .attr('height', '20')
+            .style('fill', 'gray')
+            .transition()
+            .attr('width', '200')
+            .attr('height', '200')
+            .duration(3000)
+            .each('end', function () {
+                d3.select(this)
+                        .transition()
+                        .attr('width', '20')
+                        .attr('height', '20')
+                        .duration(3000)
+            });
+    //chaining
+    svg.append('rect')
+            .attr('x', '100')
+            .attr('y', '300')
+            .attr('width', '20')
+            .attr('height', '20')
+            .style('fill', 'gray')
+            .transition()
+            .attr('width', '200')
+            .attr('height', '200')
+            .duration(3000)
+            .transition()
+            .style('fill', 'red')
+            .duration(3000);
+    //events
+    svg.append('rect')
+            .attr('x', '100')
+            .attr('y', '500')
+            .attr('width', '20')
+            .attr('height', '20')
+            .style('fill', 'gray')
+            .on('click', playTransition);
+
+    function playTransition() {
+        d3.select(this)
+                .transition()
+                .attr('x', '600')
+                .duration(1000)
+                .transition()
+                .style('fill', 'red')
+                .duration(1000)
+                .transition()
+                .attr('x', '100')
+                .delay(2000);
+
+    }
+
+</script>
+</body>
+</html>

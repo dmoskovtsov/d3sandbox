@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript"
+            src="../d3/d3.v3.js"></script>
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+<script>
+
+    d3.select('body')
+            .selectAll('p')
+            .data([5, 4, 3, 2, 1])
+            .enter()
+            .append("p")
+            .text(function (d, i) {
+                return "hello " + d;
+            });
+
+    function onClick() {
+        d3.selectAll('p')
+                .transition()
+                .delay(function (d, i) {
+                    return i * 200;
+                })
+                .style('color', 'green')
+                .style('font-size', '20px')
+                .duration(function (d, i) {
+                    return i * 1000;
+                });
+
+    }
+
+</script>
+<input type="button"
+       value="Click me"
+       onclick="onClick()">
+
+</body>
+</html>

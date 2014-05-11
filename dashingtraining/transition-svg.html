@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript"
+            src="../d3/d3.v3.js"></script>
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+<script>
+
+    var svg = d3.select('body')
+            .append('svg');
+
+    var rect1 = svg.append('rect')
+            .attr('x', '5')
+            .attr('y', '5')
+            .attr('width', '20')
+            .attr('height', '20')
+            .style('fill', 'red');
+
+    var rect2 = svg.append('rect')
+            .attr('x', '25')
+            .attr('y', '25')
+            .attr('width', '50')
+            .attr('height', '100')
+            .style('fill', 'green');
+
+    function onClick() {
+        d3.selectAll('p')
+                .transition()
+                .delay(function (d, i) {
+                    return i * 200;
+                })
+                .style('color', 'green')
+                .style('font-size', '20px')
+                .duration(function (d, i) {
+                    return i * 1000;
+                });
+
+    }
+
+</script>
+<input type="button"
+       value="Click me"
+       onclick="onClick()">
+
+</body>
+</html>
