@@ -45,7 +45,7 @@
             .transition()
             .style('fill', 'red')
             .duration(3000);
-    //events
+    //chaining
     svg.append('rect')
             .attr('x', '100')
             .attr('y', '500')
@@ -63,8 +63,7 @@
                 .style('fill', 'red')
                 .duration(1000)
                 .transition()
-                .attr('x', '100')
-                .delay(2000);
+                .attr('x', '100');
 
     }
 

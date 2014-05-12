@@ -15,37 +15,28 @@
             .append('svg');
 
     var rect1 = svg.append('rect')
-            .attr('x', '5')
-            .attr('y', '5')
-            .attr('width', '20')
-            .attr('height', '20')
-            .style('fill', 'red');
+            .attr('x', '0')
+            .attr('y', '0')
+            .attr('width', '25')
+            .attr('height', '25')
+            .style('fill', 'red')
+            .transition()
+            .duration(2000)
+            .attr('y', '25');
 
     var rect2 = svg.append('rect')
             .attr('x', '25')
             .attr('y', '25')
             .attr('width', '50')
             .attr('height', '100')
-            .style('fill', 'green');
+            .style('fill', 'green')
+            .transition()
+            .delay(2000)
+            .duration(2000)
+            .attr('y', '50');
 
-    function onClick() {
-        d3.selectAll('p')
-                .transition()
-                .delay(function (d, i) {
-                    return i * 200;
-                })
-                .style('color', 'green')
-                .style('font-size', '20px')
-                .duration(function (d, i) {
-                    return i * 1000;
-                });
-
-    }
 
 </script>
-<input type="button"
-       value="Click me"
-       onclick="onClick()">
 
 </body>
 </html>

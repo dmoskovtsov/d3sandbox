@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript"
+            src="../d3/d3.v3.js"></script>
+    <style type="text/css">
+
+    </style>
+</head>
+<body>
+<script>
+    var data = [
+        {'x': 5, 'y': 0, 'width': 50, 'height': 50, 'color': '#ff0000' },
+        {'x': 5, 'y': 100, 'width': 50, 'height': 50, 'color': '#00ff00' },
+        {'x': 5, 'y': 200, 'width': 50, 'height': 50, 'color': '#0000ff' }
+    ];
+
+    var svg = d3.select('body')
+            .append('svg');
+
+    var rects = svg.selectAll('rect')
+            .data(data)
+            .enter()
+            .append('rect')
+            .attr('x', function (d, i) {
+                return d.x;
+            })
+            .attr('y', function (d, i) {
+                return d.y;
+            })
+            .attr('width', function (d, i) {
+                return d.width;
+            })
+            .attr('height', function (d, i) {
+                return d.height;
+            })
+            .on('mouseover', highlightRect)
+            .on('mouseout', returnDefaultStyles);
+
+    function highlightRect(d, i) {
+        d3.selectAll('rect')
+                .transition()
+                .attr('opacity', '0.25');
+
+        d3.select(this)
+                .transition()
+                .style('fill', d.color);
+
+    }
+
+    function returnDefaultStyles(d, i) {
+        d3.selectAll('rect')
+                .transition()
+                .style('fill', '#000000')
+                .attr('opacity', '1');
+    }
+
+</script>
+</body>
+</html>
