@@ -31,11 +31,7 @@
             pointer-events: all;
         }
 
-        .focus circle {
-            fill: orange;
-        }
-
-        .focus text {
+        .value-indicator-text {
             font-family: sans-serif;
             font-size: 13px;
             text-anchor: middle;
@@ -136,52 +132,66 @@
 
     data.forEach(function (list, i) {
         svg.append("path")
-            .datum(list.values)
-            .attr("class", "line")
-            .attr("d", path);
+                .datum(list.values)
+                .attr("class", "line")
+                .attr("d", path);
     });
 
-
-    var yellowCircle = svg.append("g")
-            .attr("class", "focus")
+    var valueIndicatorGroup = svg.append("g")
+            .attr("class", "value-indicator")
             .style("display", "none");
 
-    yellowCircle.append("circle")
-            .attr("r", 5);
+    data.forEach(function (list, i) {
 
-    yellowCircle.append("text")
-            .attr("x", 0)
-            .attr("dy", "-0.7em");
+        valueIndicatorGroup.append("circle")
+                .attr("class", "value-indicator-circle" + i)
+                .attr("r", 5)
+                .style("fill", 'orange');
 
-    svg.append("rect")
-            .attr("class", "overlay")
-            .attr("transform", "translate(" + -tickPadding + ",0)")
-            .attr("width", width + (tickPadding * 2))
-            .attr("height", height);
+        valueIndicatorGroup.append("text")
+                .attr("class", "value-indicator-text" + i)
+                .attr("x", 0)
+                .attr("dy", "-0.7em");
+
+        svg.append("rect")
+                .attr("class", "overlay")
+                .attr("transform", "translate(" + -tickPadding + ",0)")
+                .attr("width", width + (tickPadding * 2))
+                .attr("height", height);
+    });
 
     function mouseover() {
-        yellowCircle.style("display", null);
+        d3.selectAll('.value-indicator').style("display", null);
     }
 
     function mouseout() {
-        yellowCircle.style("display", "none");
+        d3.selectAll('.value-indicator').style("display", 'none');
     }
 
     function mousemove() {
         var xPosition = d3.mouse(this)[0];
         var xValue = xScale.invert(xPosition);
 
-        var yPosition = d3.mouse(this)[1];
-        var yValue = yScale.invert(yPosition);
-        var i = bisectDate(data[0].values, xValue, 1);
-        var d = data[0].values[i - 1];
-
-        yellowCircle.attr("transform", "translate(" + xScale(d.ts) + "," + yScale(d.value) + ")");
-        yellowCircle.select("text").text(d.value);
-        console.log('x', xValue, xPosition);
-        console.log('y', yValue, yPosition);
+        data.forEach(function (list, i) {
+            var selectedPoint = getSelectedPoint(list, xValue);
+            updateValueIndicator(selectedPoint, i);
+        })
     }
 
+    function updateValueIndicator(selectedPoint, i) {
+        var xValue = xScale(selectedPoint.ts);
+        var yValue = yScale(selectedPoint.value);
+        var transform = "translate(" + xValue + "," + yValue + ")";
+        d3.select('.value-indicator-circle' + i).attr("transform", transform);
+        d3.select('.value-indicator-text' + i).attr("transform", transform);
+        d3.select('.value-indicator-text' + i).text(selectedPoint.value);
+    }
+
+    function getSelectedPoint(list, xValue) {
+        var selectedPointIndex = bisectDate(list.values, xValue, 1);
+        var selectedPoint = list.values[selectedPointIndex - 1];
+        return selectedPoint;
+    }
 
 </script>
 
