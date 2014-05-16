@@ -66,10 +66,10 @@
 
     var line = d3.svg.line()
             .x(function (d) {
-                return xScale(d.date);
+                return xScale(d.ts);
             })
             .y(function (d) {
-                return yScale(d.close);
+                return yScale(d.value);
             });
 
     var graph = d3.select("#graph")
@@ -80,15 +80,15 @@
 
     d3.csv("some.csv", function (error, data) {
         data.forEach(function (d) {
-            d.date = d3.time.format("%Y-%m-%d").parse(d.date);
-            d.close = +d.close;
+            d.ts = d3.time.format("%Y-%m-%d").parse(d.ts);
+            d.value = +d.value;
         });
 
         xScale.domain(d3.extent(data, function (d) {
-            return d.date;
+            return d.ts;
         }));
         yScale.domain(d3.extent(data, function (d) {
-            return d.close;
+            return d.value;
         }));
 
         graph.append("g")
@@ -129,7 +129,7 @@
                 .attr("x", -8)
                 .attr("y", 4)
                 .attr("text-anchor", "end")
-                .text("$" + firstRecord.close);
+                .text("$" + firstRecord.value);
         first.append("circle")
                 .attr("r", 4);
 
@@ -141,7 +141,7 @@
         last.append("text")
                 .attr("x", 8)
                 .attr("y", 4)
-                .text("$" + lastRecord.close);
+                .text("$" + lastRecord.value);
         last.append("circle")
                 .attr("r", 4);
 
@@ -157,11 +157,11 @@
                 graph.select('.y.axis').style("display", "none");
 
                 graph.select(".first")
-                        .attr("transform", "translate(" + xScale(firstRecord.date) + "," + yScale(firstRecord.close) + ")")
+                        .attr("transform", "translate(" + xScale(firstRecord.ts) + "," + yScale(firstRecord.value) + ")")
                         .style("display", "initial");
 
                 graph.select(".last")
-                        .attr("transform", "translate(" + xScale(lastRecord.date) + "," + yScale(lastRecord.close) + ")")
+                        .attr("transform", "translate(" + xScale(lastRecord.ts) + "," + yScale(lastRecord.value) + ")")
                         .style("display", "initial");
             } else {
                 graph.select('.x.axis').style("display", "initial");

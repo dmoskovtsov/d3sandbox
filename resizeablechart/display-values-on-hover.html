@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>D3: Scaled scatterplot, resized to be bigger!</title>
+    <script type="text/javascript"
+            src="../d3/d3.v3.js"></script>
+    <style type="text/css">
+
+        .yaxis line {
+            fill: none;
+            stroke: lightgray;
+            stroke-width: 1px;
+            shape-rendering: crispEdges;
+        }
+
+        .xaxis text,
+        .yaxis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+
+        .line {
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 2px;
+        }
+
+        .overlay {
+            fill: none;
+            pointer-events: all;
+        }
+
+        .focus circle {
+            fill: orange;
+        }
+
+        .focus text {
+            font-family: sans-serif;
+            font-size: 13px;
+            text-anchor: middle;
+            fill: orange;
+        }
+
+
+    </style>
+</head>
+<body>
+<script>
+
+    var tickPadding = 15;
+    var margin = {top: 20, right: 35, bottom: 30, left: 35};
+    var width = 500 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
+    var bisectDate = d3.bisector(function (d) {
+        return d.ts;
+    }).left;
+    var parseDate = d3.time.format("%Y").parse;
+    var data = [
+        {ts: parseDate("2009"), value: "53"},
+        {ts: parseDate("2010"), value: "67"},
+        {ts: parseDate("2011"), value: "89"},
+        {ts: parseDate("2012"), value: "99"}
+    ];
+    var yScale = d3.scale.linear()
+            .domain([0, 100])
+            .range([height, 0]);
+
+    var xScale = d3.time.scale()
+            .range([0, width]);
+
+    var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .ticks(4)
+            .tickSize(-width - (tickPadding * 2), 0, 0)
+            .orient("left");
+
+    var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .ticks(3)
+            .orient("bottom");
+
+    var marketShare = d3.svg.line()
+            .x(function (d) {
+                return xScale(d.ts);
+            })
+            .y(function (d) {
+                return yScale(d.value);
+            });
+
+    var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .on("mouseover", mouseover).
+            on("mouseout", mouseout).
+            on("mousemove", mousemove);
+
+    xScale.domain([data[0].ts, data[data.length - 1].ts]);
+
+    var xAxisDisplay = svg.append("g")
+            .attr("class", "xaxis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+    svg.append("g")
+            .attr("class", "yaxis")
+            .attr("transform", "translate(" + -tickPadding + ",0)")
+            .call(yAxis);
+
+    svg.append("path")
+            .datum(data)
+            .attr("class", "line")
+            .attr("d", marketShare);
+
+    svg.selectAll("circle")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) {
+                return xScale(d.ts);
+            })
+            .attr("cy", function (d) {
+                return yScale(d.value);
+            })
+            .attr("r", 5)
+            .attr("fill", "steelblue");
+
+    var yellowCircle = svg.append("g")
+            .attr("class", "focus")
+            .style("display", "none");
+
+    yellowCircle.append("circle")
+            .attr("r", 5);
+
+    yellowCircle.append("text")
+            .attr("x", 0)
+            .attr("dy", "-0.7em");
+
+    svg.append("rect")
+            .attr("class", "overlay")
+            .attr("transform", "translate(" + -tickPadding + ",0)")
+            .attr("width", width + (tickPadding * 2))
+            .attr("height", height);
+
+    function mouseover() {
+        yellowCircle.style("display", null);
+        var item = data[bisectDate(data, parseDate("2011"))];
+        console.log(item.value, yScale(item.value));
+    }
+
+    function mouseout() {
+        yellowCircle.style("display", "none");
+    }
+
+    function mousemove() {
+        var xPosition = d3.mouse(this)[0];
+        var xValue = xScale.invert(xPosition);
+
+        var yPosition = d3.mouse(this)[1];
+        var yValue = yScale.invert(yPosition);
+        var i = bisectDate(data, xValue, 1);
+        var d = data[i - 1];
+
+        yellowCircle.attr("transform", "translate(" + xScale(d.ts) + "," + yScale(d.value) + ")");
+        yellowCircle.select("text").text(d.value);
+        console.log('x', xValue, xPosition);
+        console.log('y', yValue, yPosition);
+    }
+
+
+</script>
+
+</body>
+</html>
