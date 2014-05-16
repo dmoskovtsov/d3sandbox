@@ -52,21 +52,30 @@
     var margin = {top: 20, right: 35, bottom: 30, left: 35};
     var width = 500 - margin.left - margin.right;
     var height = 500 - margin.top - margin.bottom;
+    var parseDate = d3.time.format("%Y").parse;
     var bisectDate = d3.bisector(function (d) {
         return d.ts;
     }).left;
-    var parseDate = d3.time.format("%Y").parse;
     var data = [
-        {ts: parseDate("2009"), value: "53"},
-        {ts: parseDate("2010"), value: "67"},
-        {ts: parseDate("2011"), value: "89"},
-        {ts: parseDate("2012"), value: "99"}
+        {name: 'tag1', values: [
+            {ts: parseDate("2009"), value: "53"},
+            {ts: parseDate("2010"), value: "67"},
+            {ts: parseDate("2011"), value: "20"},
+            {ts: parseDate("2012"), value: "99"}
+        ]},
+        {name: 'tag2', values: [
+            {ts: parseDate("2009"), value: "12"},
+            {ts: parseDate("2010"), value: "34"},
+            {ts: parseDate("2011"), value: "50"},
+            {ts: parseDate("2012"), value: "12"}
+        ]}
     ];
     var yScale = d3.scale.linear()
             .domain([0, 100])
             .range([height, 0]);
 
     var xScale = d3.time.scale()
+            .domain([data[0].values[0].ts, data[0].values[data[0].values.length - 1].ts])
             .range([0, width]);
 
     var yAxis = d3.svg.axis()
@@ -80,7 +89,7 @@
             .ticks(3)
             .orient("bottom");
 
-    var marketShare = d3.svg.line()
+    var path = d3.svg.line()
             .x(function (d) {
                 return xScale(d.ts);
             })
@@ -93,11 +102,10 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .on("mouseover", mouseover).
-            on("mouseout", mouseout).
-            on("mousemove", mousemove);
+            .on("mouseover", mouseover)
+            .on("mouseout", mouseout)
+            .on("mousemove", mousemove);
 
-    xScale.domain([data[0].ts, data[data.length - 1].ts]);
 
     var xAxisDisplay = svg.append("g")
             .attr("class", "xaxis")
@@ -109,23 +117,30 @@
             .attr("transform", "translate(" + -tickPadding + ",0)")
             .call(yAxis);
 
-    svg.append("path")
-            .datum(data)
-            .attr("class", "line")
-            .attr("d", marketShare);
+    data.forEach(function (list, i) {
+        svg.selectAll("circle" + i)
+                .data(list.values)
+                .enter()
+                .append("circle")
+                .attr('class', 'circle' + i)
+                .attr("cx", function (d) {
+                    console.log(xScale(d.ts));
+                    return xScale(d.ts);
+                })
+                .attr("cy", function (d) {
+                    return yScale(d.value);
+                })
+                .attr("r", 5)
+                .attr("fill", "steelblue");
+    });
 
-    svg.selectAll("circle")
-            .data(data)
-            .enter()
-            .append("circle")
-            .attr("cx", function (d) {
-                return xScale(d.ts);
-            })
-            .attr("cy", function (d) {
-                return yScale(d.value);
-            })
-            .attr("r", 5)
-            .attr("fill", "steelblue");
+    data.forEach(function (list, i) {
+        svg.append("path")
+            .datum(list.values)
+            .attr("class", "line")
+            .attr("d", path);
+    });
+
 
     var yellowCircle = svg.append("g")
             .attr("class", "focus")
@@ -146,8 +161,6 @@
 
     function mouseover() {
         yellowCircle.style("display", null);
-        var item = data[bisectDate(data, parseDate("2011"))];
-        console.log(item.value, yScale(item.value));
     }
 
     function mouseout() {
@@ -160,8 +173,8 @@
 
         var yPosition = d3.mouse(this)[1];
         var yValue = yScale.invert(yPosition);
-        var i = bisectDate(data, xValue, 1);
-        var d = data[i - 1];
+        var i = bisectDate(data[0].values, xValue, 1);
+        var d = data[0].values[i - 1];
 
         yellowCircle.attr("transform", "translate(" + xScale(d.ts) + "," + yScale(d.value) + ")");
         yellowCircle.select("text").text(d.value);
